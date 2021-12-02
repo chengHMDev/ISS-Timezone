@@ -11,8 +11,6 @@ class ISS{
 	$result = json_decode($json, true);
 	$this->name = $result[0]["name"];
 	$this->satID = $result[0]["id"];
-	echo $this->name;
-	echo $this->satID;
   }
   function set_name($name) {
     $this->name = $name;
@@ -66,13 +64,11 @@ class ISS{
 					$predictedResult = $this -> predictLocations($predict_time);
 					if($predictedResult[0][2] != "??"){
 						$prediction = True;
-						print_r("<br>*****************************Predicted*********************<br>");
 						$location["timezone_id"] = $predictedResult[0][1];
 						$location["country_code"] = $predictedResult[0][2];
 					}
 				}
 				$counter = $counter + 1;
-				print_r("<br>*****************************FAIL*********************<br>");
 			}
 			$predictedResult = $this -> predictLocations((int)$result["timestamp"]);
 		}
@@ -86,7 +82,6 @@ class ISS{
   
   //this is the prediction func
   function predictLocations($timestamp){
-	  print_r("test");
 	  $URL = $this->baseURL.$this->satID."/positions?timestamps=".$timestamp."&units=miles";
 	  $json = file_get_contents($URL);
 	  $resultSet = json_decode($json, true);
@@ -102,7 +97,6 @@ class ISS{
 		$location = json_decode($json, true);
 		array_push($predictedResult,[$result["timestamp"],$location["timezone_id"],$location["country_code"]]);
 	  }
-	  print_r($predictedResult);
 	  return $predictedResult;
   }
   
