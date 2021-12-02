@@ -53,8 +53,27 @@ class ISS{
 		$json = file_get_contents($locURL);
 		$location = json_decode($json, true);
 		if($location["country_code"] == "??"){
-			counter = 0;
-			//add prediction criteria here
+			$counter = 1;
+			$predict_time = (int)$result["timestamp"];
+			$prediction = False;
+			//kill the loop if prediction can't retrive a value in 3 tried to prevent application crash
+			//this area to be improved.
+			while($prediction == False){
+				$predict_time = $predict_time + 60;
+				if($counter >= 3){
+					break;
+				}else{
+					$predictedResult = $this -> predictLocations($predict_time);
+					if($predictedResult[0][2] != "??"){
+						$prediction = True;
+						print_r("<br>*****************************Predicted*********************<br>");
+						$location["timezone_id"] = $predictedResult[0][1];
+						$location["country_code"] = $predictedResult[0][2];
+					}
+				}
+				$counter = $counter + 1;
+				print_r("<br>*****************************FAIL*********************<br>");
+			}
 			$predictedResult = $this -> predictLocations((int)$result["timestamp"]);
 		}
 		array_push($locationResult,[$result["timestamp"],$location["timezone_id"],$location["country_code"]]);
@@ -63,11 +82,11 @@ class ISS{
 	  return $locationResult;
   }
   
+  //future version needs a saprate fuction for getLocation for single instance.
   
-  //this fuction predict the data for the missing value by adding 1 minutes to the time until a result is obttained
+  //this is the prediction func
   function predictLocations($timestamp){
 	  print_r("test");
-	  $timestamp = $timestamp + 60 ;
 	  $URL = $this->baseURL.$this->satID."/positions?timestamps=".$timestamp."&units=miles";
 	  $json = file_get_contents($URL);
 	  $resultSet = json_decode($json, true);
@@ -83,7 +102,6 @@ class ISS{
 		$location = json_decode($json, true);
 		array_push($predictedResult,[$result["timestamp"],$location["timezone_id"],$location["country_code"]]);
 	  }
-	  print_r("<br>*****************************Predicted*********************<br>");
 	  print_r($predictedResult);
 	  return $predictedResult;
   }
