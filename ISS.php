@@ -55,20 +55,10 @@ class ISS{
 		array_push($locationResult,[$result["timestamp"],$location["timezone_id"],$location["country_code"]]);
 		
 	  }
-	  print_r($locationResult);
-  }
-  
-  //generate 13 point timestamp 
-  function generateTimestamp($timestamp){
-	  $timestamp = $timestamp - 3600;
-	  //generate for every 600
+	  return $locationResult;
   }
   
   
 }
 
-
-
-$instance1 = new ISS();
-echo $instance1->getLocations([1436029892,1436029892]);
 ?>
